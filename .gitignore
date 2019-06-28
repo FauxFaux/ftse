@@ -1,1 +1,4 @@
 fetch.py
+node_modules/
+dist/
+.idea/
