@@ -25,29 +25,8 @@ class App extends React.Component<{}, IAppState> {
     fetch("../raw.tsv")
       .then(res => res.text())
       .then(res => {
-        const raw = [];
-        for (const line of res.split('\n')) {
-          if (line.trim().length === 0) {
-            continue;
-          }
-          const [day, low, high, open, close, volume] = line.split('\t');
-
-          if ('None' === low) {
-            // non-trading days
-            continue;
-          }
-
-          raw.push({
-            day,
-            low: parseInt(low),
-            high: parseInt(high),
-            open: parseInt(open),
-            close: parseInt(close),
-            volume: 'None' !== volume ? parseInt(volume) : null});
-        }
-        raw.shift(); // header
-        this.setState({raw});
-      })
+        this.setState({raw: parseTsv(res)});
+      });
   }
 
   render() {
@@ -62,3 +41,29 @@ ReactDOM.render(
   <App/>,
   document.getElementById("app"),
 );
+
+function parseTsv(res: string): IRecord[] {
+  const raw = [];
+  for (const line of res.split('\n')) {
+    if (line.trim().length === 0) {
+      continue;
+    }
+    const [day, low, high, open, close, volume] = line.split('\t');
+
+    if ('None' === low) {
+      // non-trading days
+      continue;
+    }
+
+    raw.push({
+      day,
+      low: parseInt(low),
+      high: parseInt(high),
+      open: parseInt(open),
+      close: parseInt(close),
+      volume: 'None' !== volume ? parseInt(volume) : null
+    });
+  }
+  raw.shift(); // header
+  return raw;
+}
